@@ -1,7 +1,8 @@
 import passport from "passport";
-import local from 'passport-local'
+//import local from 'passport-local'
 import UserModel from "../models/user.model.js"
 import GitHubStrategy from 'passport-github2'
+//import { extractCookie, generateToken, createHash, isValidPassword } from "../utils.js";
 import { extractCookie, generateToken } from "../utils.js";
 import passportJWT from 'passport-jwt'
 import passportGoogle from 'passport-google-oauth20'
@@ -10,12 +11,12 @@ const JWTStrategy = passportJWT.Strategy // La estrategia de JWT
 const JWTextract = passportJWT.ExtractJwt // La funcion de extraccion
 
 
-const cookieExtractor = req => {
+/*const cookieExtractor = req => {
     const token = (req?.cookies) ? req.cookies['coderCookie'] : null
 
     console.log('COOKIE EXTRACTOR: ', token)
     return token
-}
+} */
 
 
 const initializePassport = () => {
@@ -24,7 +25,7 @@ const initializePassport = () => {
         'jwt',
         new JWTStrategy(
             {
-                jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
+                jwtFromRequest: JWTextract.fromExtractors([extractCookie]),
                 secretOrKey: 'secretForJWT'
             },
             async (jwt_payload, done) => {
@@ -80,29 +81,22 @@ const initializePassport = () => {
 
     ));
 
-    passport.serializeUser(async (user, done) => {
-        return done(null, user._id)
-    })
+    
 
-    passport.deserializeUser(async (id, done) => {
-        const user = await UserModel.findById(id)
-        return  user
-    })
-
-    /*locall */
-    const LocalStrategy = local.Strategy
+    /*locall 
+    const LocalStrategy = local.Strategy */
 
 
 
 
     // register Es el nomber para Registrar con Local
-    passport.use('register', new LocalStrategy(
+    /*passport.use('register', new LocalStrategy(
         {
             passReqToCallback: true,
             usernameField: 'email'
         },
         async (req, username, password, done) => {
-            const { name, email } = req.body
+            const { first_name, last_name, age, social, role } = req.body
             try {
                 const user = await UserModel.findOne({ email: username })
                 if (user) {
@@ -111,20 +105,24 @@ const initializePassport = () => {
                 }
 
                 const newUser = {
-                    name,
-                    email,
-                    password: createHash(password)
+                    first_name,
+                    last_name,
+                    age,
+                    email: username,
+                    password: createHash(password),
+                    social,
+                    role
                 }
                 const result = await UserModel.create(newUser)
                 return done(null, result)
             } catch (e) {
-                return done('Error to register ' + error)
+                return done('Error to register ' + e)
             }
         }
-    ))
+    )) */
 
     // login Es el nomber para IniciarSesion con Local
-    passport.use('login', new LocalStrategy(
+    /*passport.use('login', new LocalStrategy(
         { usernameField: 'email' },
         async (username, password, done) => {
             try {
@@ -141,19 +139,12 @@ const initializePassport = () => {
 
                 return done(null, user)
             } catch (e) {
-                return done('Error login ' + error)
+                return done('Error login ' + e)
             }
         }
-    ))
+    )) 
 
-    passport.serializeUser(async(user, done) => {
-        return done (null, user._id)
-    })
-
-    passport.deserializeUser(async (id, done) => {
-        const user = await UserModel.findById(id)
-        return user
-    })
+   */
 
 
 
@@ -179,11 +170,13 @@ const initializePassport = () => {
                     console.log(`User doesn't exits. So register them`)
 
                     const newUser = {
-                        name: profile._json.name,
-                        email,
+                        first_name: profile._json.name,
+                        last_name,
+                        age,
+                        email: profile._json.email,
                         password: '',
                         social: 'github',
-                        role: 'user'
+                        role: 'usuario'
                 }        
    
                 const result = await UserModel.create(newUser)
@@ -203,13 +196,13 @@ const initializePassport = () => {
     ))
 
     // register Es el nomber para Registrar con Local
-    passport.use('register', new LocalStrategy(
+    /*passport.use('register', new LocalStrategy(
         {
             passReqToCallback: true,
             usernameField: 'email'
         },
         async (req, username, password, done) => {
-            const { name, email } = req.body
+            const { first_name, last_name, age, social, role } = req.body
             try {
                 const user = await UserModel.findOne({ email: username })
                 if (user) {
@@ -218,14 +211,18 @@ const initializePassport = () => {
                 }
 
                 const newUser = {
-                    name,
+                    first_name,
+                    last_name,
+                    age,
                     email,
-                    password: createHash(password)
+                    password: createHash(password),
+                    social,
+                    role
                 }
                 const result = await UserModel.create(newUser)
                 return done(null, result)
             } catch (e) {
-                return done('Error to register ' + error)
+                return done('Error to register ' + e)
             }
         }
     ))
@@ -248,18 +245,20 @@ const initializePassport = () => {
 
                 return done(null, user)
             } catch (e) {
-                return done('Error login ' + error)
+                return done('Error login ' + e)
             }
         }
     ))
 
-    passport.serializeUser(async(user, done) => {
+   */
+
+    passport.serializeUser(async (user, done) => {
         return done(null, user._id)
     })
 
     passport.deserializeUser(async (id, done) => {
         const user = await UserModel.findById(id)
-        return user
+        return  user
     })
 
 }
