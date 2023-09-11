@@ -1,9 +1,9 @@
 import passport from "passport";
-//import local from 'passport-local'
+import local from 'passport-local'
 import UserModel from "../models/user.model.js"
 import GitHubStrategy from 'passport-github2'
-//import { extractCookie, generateToken, createHash, isValidPassword } from "../utils.js";
-import { extractCookie, generateToken } from "../utils.js";
+import { extractCookie, generateToken, createHash, isValidPassword } from "../utils.js";
+//import { extractCookie, generateToken } from "../utils.js";
 import passportJWT from 'passport-jwt'
 import passportGoogle from 'passport-google-oauth20'
 
@@ -18,6 +18,13 @@ const JWTextract = passportJWT.ExtractJwt // La funcion de extraccion
     return token
 } */
 
+var GoogleStrategy = passportGoogle.Strategy;
+
+    const GOOGLE_CLIENT_ID = '609516804216-3nioo3vq0d1vmtaq6o8itqnsusugu0om.apps.googleusercontent.com'
+    const GOOGLE_CLIENT_SECRET = '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'
+
+/*locall */
+const LocalStrategy = local.Strategy     
 
 const initializePassport = () => {
 
@@ -50,11 +57,7 @@ const initializePassport = () => {
 
 
 
-    var GoogleStrategy = passportGoogle.Strategy;
-
-    const GOOGLE_CLIENT_ID = '609516804216-3nioo3vq0d1vmtaq6o8itqnsusugu0om.apps.googleusercontent.com'
-    const GOOGLE_CLIENT_SECRET = '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'
-
+    
 
 
     passport.use('google', new GoogleStrategy({
@@ -83,27 +86,32 @@ const initializePassport = () => {
 
     
 
-    /*locall 
-    const LocalStrategy = local.Strategy */
+    
 
 
 
 
     // register Es el nomber para Registrar con Local
-    /*passport.use('register', new LocalStrategy(
+    passport.use('register', new LocalStrategy(
         {
             passReqToCallback: true,
             usernameField: 'email'
         },
         async (req, username, password, done) => {
-            const { first_name, last_name, age, social, role } = req.body
+        console.log(username);
+            const { first_name, last_name, age, social } = req.body
             try {
                 const user = await UserModel.findOne({ email: username })
                 if (user) {
                     console.log('User already exits')
                     return done(null, false)
                 }
-
+                let rol;
+                if (username === "adminCoder@coder.com" && password ==="adminCod3r123"){
+                    rol="admin";
+                } else {
+                    rol="user";
+                }
                 const newUser = {
                     first_name,
                     last_name,
@@ -111,22 +119,24 @@ const initializePassport = () => {
                     email: username,
                     password: createHash(password),
                     social,
-                    role
+                   
                 }
+
                 const result = await UserModel.create(newUser)
                 return done(null, result)
             } catch (e) {
                 return done('Error to register ' + e)
             }
         }
-    )) */
+    )) 
 
     // login Es el nomber para IniciarSesion con Local
-    /*passport.use('login', new LocalStrategy(
+    passport.use('login', new LocalStrategy(
         { usernameField: 'email' },
         async (username, password, done) => {
             try {
                 const user = await UserModel.findOne({ email: username }).lean().exec()
+                
                 if (!user) {
                     console.error('User doesnt exist')
                     return done(null, false)
@@ -136,7 +146,7 @@ const initializePassport = () => {
                     console.error('Password not valid')
                     return done(null, false)
                 }
-
+                console.log(user.password)
                 return done(null, user)
             } catch (e) {
                 return done('Error login ' + e)
@@ -144,7 +154,7 @@ const initializePassport = () => {
         }
     )) 
 
-   */
+   
 
 
 
@@ -176,7 +186,7 @@ const initializePassport = () => {
                         email: profile._json.email,
                         password: '',
                         social: 'github',
-                        role: 'usuario'
+                        rol: 'usuario'
                 }        
    
                 const result = await UserModel.create(newUser)

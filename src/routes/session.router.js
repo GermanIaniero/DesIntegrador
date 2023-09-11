@@ -2,9 +2,15 @@ import { Router } from "express";
 import UserModel from "../models/user.model.js";
 import productModel from "../models/productModel.js";
 import passport from "passport";
-import { createHash, isValidPassword } from "../utils.js";
+import { createHash, isValidPassword, generateToken } from "../utils.js";
 
 const router = Router()
+
+router.get('/all', async(req, res) => { 
+    let users = await UserModel.find()
+    res.send(users)
+   }
+)
 
 router.get('/login', async (req, res) => {
     if(!req.session.user){ res.render('login')}   
@@ -12,9 +18,34 @@ router.get('/login', async (req, res) => {
 })
 
 
-router.post('/login', passport.authenticate('login', '/login'), async (req, res) => {
+router.post('/login', passport.authenticate('login'), async (req, res) => {
 
-    const { email, password } = req.body
+    //passport.authenticate('register', { failureRedirect: '/register', }),
+    //async (req, res) => {
+       try {
+               
+        console.log(req.user)
+        let user = req.user
+        const access_token = generateToken(user)
+    
+        return res.cookie('coderCookie', access_token, {
+            maxAge: 60*60*1000,
+            httpOnly: true
+        }).redirect('/')
+       
+        }catch (e){  
+            console.log(e);
+        } 
+
+
+
+
+
+
+
+
+
+   /* const { email, password } = req.body
     const user = await UserModel.findOne({ email, password }).lean().exec()
    
     if(!user) return res.redirect("/login")
@@ -40,7 +71,7 @@ router.post('/login', passport.authenticate('login', '/login'), async (req, res)
                     
            res.render('home', { products, user})
 
-           console.log(user)  
+           console.log(user)  */
 })
 
 
@@ -48,10 +79,18 @@ router.post('/register',
 passport.authenticate('register', { failureRedirect: '/register', }),
 async (req, res) => {
    try {
+           
+    console.log(req.body)
+    let user = req.body
+    const access_token = generateToken(user)
+
+    res.cookie('coderCookie', access_token, {
+        maxAge: 60*60*1000,
+        httpOnly: true
+    }).send({message: 'Logged In!'})
+    /*            //let {first_name, last_name, email, age, password} = req.body
             
-            //let {first_name, last_name, email, age, password} = req.body
-            
-            let user = {first_name, last_name, email, age, password:createHash(password)} 
+           /* let user = {first_name, last_name, email, age, password:createHash(password)} 
             
             
             console.log (req.body)
@@ -64,13 +103,13 @@ async (req, res) => {
                     console.log("Bienvenido Admin");
                     user.rol="admin";
                 }  
-                */
+                
                 await UserModel.create({first_name, last_name, email, age, password});
                 return res.redirect("/login");
             } else {
                 alert ('Ya existe el usuario')
             }
-        
+        */
     }catch (e){  
         console.log(e);
     }    

@@ -15,11 +15,11 @@
           <form action="/api/session/login" method="post">
             <div class="mb-3">
               <label for="email">Email:</label>
-              <input type="email" class="form-control bg-dark text-white" name="email" placeholder="Email" autofocus />
+              <input id="email" type="email" class="form-control bg-dark text-white" name="email" placeholder="Email" autofocus />
             </div>
             <div class="mb-3">
               <label for="password">Password:</label>
-              <input type="password" class="form-control bg-dark text-white" name="password" placeholder="Password" />
+              <input id="password" type="password" class="form-control bg-dark text-white" name="password" placeholder="Password" />
             </div>
             <button type="submit" class="btn btn-success btn-block">
               Enviar
@@ -40,7 +40,7 @@
     const email = document.getElementById('email').value
     const password = document.getElementById('password').value
 
-    fetch('/jwt/login', {
+    fetch('/api/session/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
       headers: { 'Content-Type': 'application/json' }
