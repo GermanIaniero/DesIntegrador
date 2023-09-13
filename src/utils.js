@@ -5,7 +5,7 @@ const __dirname = dirname(__filename)
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
-const PRIVATE_KEY = 'coderTokenForJWT'
+const PRIVATE_KEY = 'secretForJWT'
 
 export const createHash = (password) => {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(10))
@@ -20,7 +20,7 @@ export const generateToken = user => {
 }
 
 export const extractCookie = req => {
-    return (req && req.cookies) ? req.cookies['keyCookieForJWT'] : null
+    return (req && req.cookies) ? req.cookies['coderCookie'] : null
 }
 
 // JWT Extraemos el token del header
@@ -29,7 +29,7 @@ export const authToken = (req, res, next) => {
     // Buscamos el token en el header o en la cookie
     let authHeader = req.headers.auth
     if(!authHeader) {
-      authHeader = req.cookies['coderToken'] 
+      authHeader = req.cookies['coderCookie'] 
       if(!authHeader) {
         return res.status(401).send({
             error: 'Not auth'

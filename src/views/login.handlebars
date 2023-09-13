@@ -1,5 +1,3 @@
-<form id='form'>
-
   <div class="row">
     <div class="col-md-4 mx-auto">
       <div class="card mt-5 bg-black text-white rounded">
@@ -12,7 +10,7 @@
           src="https://toppng.com/public/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png"
           width="50px" height="50px" alt="Logo" />
         <div class="card-body">
-          <form action="/api/session/login" method="post">
+          <form id='form' action="login" method="post">
             <div class="mb-3">
               <label for="email">Email:</label>
               <input id="email" type="email" class="form-control bg-dark text-white" name="email" placeholder="Email" autofocus />
@@ -31,9 +29,9 @@
       </div>
     </div>
   </div>
-</form>
 
-<script>
+
+<!--<script>
   document.getElementById('form').onsubmit = e => {
     e.preventDefault()
 
@@ -47,7 +45,9 @@
     })
       .then(r => r.json())
       .then(data => {
+        
         console.log(data)
+        window.location.href = "/"
       })
   }
-</script>
+</script> -->

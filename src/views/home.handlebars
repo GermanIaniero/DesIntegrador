@@ -29,9 +29,9 @@
 			<li class="dropdown">
 				<a href="#" data-toggle="dropdown" class="dropdown-toggle user-action"><img src="https://toppng.com/public/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png" class="avatar" alt="Avatar"> {{this.first_name}} {{this.last_name}} <b class="caret"></b></a>
 				<ul class="dropdown-menu">
-					<li><a href="#"><i class="fa fa-user-o"></i>  {{user.first_name}} {{user.last_name}}</a></li>
-					<li><a href="#"><i class="fa fa-calendar-o"></i>  {{user.email}}</a></li>
-					<li><a href="#"><i class="fa fa-sliders"></i> {{user.age}}</a></li>
+					<li><a href="#"><i class="fa fa-user-o"></i>  {{user.user.first_name}} {{user.user.last_name}}</a></li>
+					<li><a href="#"><i class="fa fa-calendar-o"></i>  {{user.user.email}}</a></li>
+					<li><a href="#"><i class="fa fa-sliders"></i> {{user.user.age}}</a></li>
 					<li class="divider"></li>
 					<button id="logoutButton">Logout</button>
                     
@@ -48,13 +48,13 @@
 <button id="current">Just User</button>
 <button id="everyone">Everyone logged</button>
 
-<h3>Bienvenido al sistema {{user.first_name}} {{user.last_name}}</h3>
+<h3>Bienvenido al sistema {{user.user.first_name}} {{user.user.last_name}}</h3>
 
 <h1 class="text-center">Lista de productos asincronos</h1>
 
 <div>
     <div style="display: flex; flex-wrap: wrap; justify-content: center;">
-        {{#each products}}
+        {{#each result.docs}}
         {{#if this.status}}
         <div class="card" style="margin: 10px 100px">
             <img src={{this.thumbnail}} width="200px" alt="img - {{this.thumbnail}}">

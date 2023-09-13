@@ -3,16 +3,18 @@ import productModel from "../models/productModel.js";
 import cartModel from "../models/cartModel.js";
 import passport from "passport";
 import chatModel from "../models/modelMessage.js"
+import { authToken, generateToken } from "../utils.js";
+
 
 const router = Router()
 
-router.get('/', async (req, res) => {
-    //const products = await productModel.find().lean().exec()
-    
+router.get('/', passport.authenticate('jwt', {session: false })
+, async (req, res) => {
+        
     const page = parseInt(req.query?.page || 1)
     const limit = parseInt(req.query?.limit || 10)
 
-    const queryParams = req.query?.query || '' //query=price,5
+    const queryParams = req.query?.query || '' 
     const query = {}
 
     if (queryParams) {
@@ -26,9 +28,7 @@ router.get('/', async (req, res) => {
     //*************************************** */
 
     const sortOrder = req.query?.sort
-    console.log("aca el sort")
-
-
+    
     const result = await productModel.paginate(query, {
         page,
         sort: { 'price': sortOrder === 'desc' ? -1 : 1 },
@@ -39,7 +39,6 @@ router.get('/', async (req, res) => {
     result.prevLink = result.hasPrevPage ? `/?page=${result.prevPage}&limit=${limit}` : ''
     result.nextLink = result.hasNextPage ? `/?page=${result.nextPage}&limit=${limit}` : ''
 
-    console.log(result)
     const objetoPedido = {
         status: "success",
         payload: result.docs,
@@ -53,16 +52,11 @@ router.get('/', async (req, res) => {
         nextLink: result.nextLink,
     }
     const resultado= await cartModel.findOne();
-    result.cartId = resultado._id
-    res.render('home', result)   
+    result.cartId = resultado._id 
     
-   /*if (req.session?.user) {
-        let user = (req.session.user)
-        res.render('home', { products, user, result})    
-    }
-    else{
-        res.render('home', { products, result})    
-    }*/
+    let user = req.user
+    res.render('home', {user, result}) 
+    
 
 })
 
@@ -78,34 +72,27 @@ router.get('/form-products', async (req, res) => {
 router.get('/cartdetail/:cid', async (req, res) => {
     const cartId = req.params.cid
     const carts = await cartModel.findOne({ _id: cartId }).populate('products.pid').lean().exec()
-    console.log(carts)
     res.render('cartDetail', { carts })
 
 })
 
 router.get('/chat', async (req, res) => {
-    //res.render('chat', {}) // 
-
     const chat = await chatModel.find().lean().exec()
     res.render('chat', { chat })
 })
 
 router.get('/register', (req, res) => {
-    if(req.session?.user) {
+   
         res.redirect('/profile')
-    }
-
-    res.render('register', {})
+      res.render('register', {})
 })
 
 function auth(req, res, next) {
-    if(req.session?.user) return next()
     res.redirect('/')
 }
 
-router.get('/profile', auth, (req, res) => {
-    const user = req.session.user
-
+router.get('/profile', authToken, (req, res) => {
+    let user = req.user
     res.render('profile', user)
 })
 
@@ -123,6 +110,21 @@ router.get(
     '/callback-google',
     passport.authenticate('google', {failureRedirect: '/'}), (req, res) => {
     res.send('Logged !!')
+})
+
+router.post('/login', passport.authenticate('login'), async (req, res) => {
+       try {
+        let user = req.user
+        const access_token = generateToken(user)
+    
+        return res.cookie('coderCookie', access_token, {
+            maxAge: 60*60*1000,
+            httpOnly: true
+        }).render ("profile", user)
+       
+        }catch (e){  
+            console.log(e);
+        } 
 })
 
 router.post('/form-products', async (req, res) => {
