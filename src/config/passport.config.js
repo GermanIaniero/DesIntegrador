@@ -1,6 +1,7 @@
 import passport from "passport";
 import local from 'passport-local'
 import UserModel from "../models/user.model.js"
+import cartModel from "../models/cartModel.js"
 import GitHubStrategy from 'passport-github2'
 import { extractCookie, generateToken, createHash, isValidPassword } from "../utils.js";
 import passportJWT from 'passport-jwt'
@@ -58,9 +59,12 @@ const initializePassport = () => {
         callbackURL: "http://127.0.0.1:8080/callback-google"
     },
         async (accessToken, refreshToken, profile, done) => {
-           
+           console.log (profile)
+
             const email = profile.emails[0].value
-            const name = profile.displayName
+            const first_name = profile.displayName
+            const age = profile.age
+            
 
             const user = await UserModel.findOne({ email })
             if (user) {
@@ -68,7 +72,9 @@ const initializePassport = () => {
                 return done(null, user)
             }
 
-            const result = await UserModel.create({ email, name, password: '' });
+            const crearcarrito = await cartModel.create({})
+
+            const result = await UserModel.create({ email, first_name, password: '', social: "Google", cartid: crearcarrito._id });
 
             return done(null, result)
 
@@ -89,6 +95,9 @@ const initializePassport = () => {
             const { first_name, last_name, age, social } = req.body
             try {
                 const user = await UserModel.findOne({ email: username })
+
+                console.log(user)
+                
                 if (user) {
                     console.log('User already exits')
                     return done(null, false)
@@ -99,6 +108,8 @@ const initializePassport = () => {
                 } else {
                     rol="user";
                 }
+                const crearcarrito = await cartModel.create({})
+
                 const newUser = {
                     first_name,
                     last_name,
@@ -106,6 +117,7 @@ const initializePassport = () => {
                     email: username,
                     password: createHash(password),
                     social,
+                    cartid: crearcarrito._id
                    
                 }
 
@@ -160,7 +172,9 @@ const initializePassport = () => {
                    // return done(null, user)
                 }else {
                     console.log(`User doesn't exits. So register them`)
-
+                    
+                    const crearcarrito = await cartModel.create({})
+                    
                     const newUser = {
                         first_name: profile._json.name,
                         last_name,
@@ -168,7 +182,8 @@ const initializePassport = () => {
                         email: profile._json.email,
                         password: '',
                         social: 'github',
-                        rol: 'usuario'
+                        rol: 'usuario',
+                        cartid: crearcarrito._id
                 }        
    
                 const result = await UserModel.create(newUser)

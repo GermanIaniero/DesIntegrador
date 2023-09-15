@@ -7,7 +7,7 @@ const UserModel = mongoose.model('users', new mongoose.Schema({
     age: Number,
     social:  String,
     rol: {type: String, required:true, default:"usuario", enum:['usuario','admin']},
-    //carts: [{ cid: {type: Schema.Types.ObjectId, ref: 'cart'}, quantity: Number}], 
+    cartid: {type: mongoose.Schema.Types.ObjectId, ref:'cart'}, 
     password: String
 }))
 

@@ -28,7 +28,7 @@ async (req, res) => {
     res.cookie('coderCookie', access_token, {
         maxAge: 60*60*1000,
         httpOnly: true
-    }).send({message: 'Logged In!'})
+    }).redirect("/login")
    
     }catch (e){  
         console.log(e);

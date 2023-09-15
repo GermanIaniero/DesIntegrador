@@ -83,7 +83,7 @@ router.get('/chat', async (req, res) => {
 
 router.get('/register', (req, res) => {
    
-        res.redirect('/profile')
+       // res.redirect('/profile')
       res.render('register', {})
 })
 
