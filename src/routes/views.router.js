@@ -117,10 +117,11 @@ router.post('/login', passport.authenticate('login'), async (req, res) => {
         let user = req.user
         const access_token = generateToken(user)
     
-        return res.cookie('coderCookie', access_token, {
+       res.cookie('coderCookie', access_token, {
             maxAge: 60*60*1000,
             httpOnly: true
-        }).render ("profile", user)
+        })
+        res.render("profile", user)
        
         }catch (e){  
             console.log(e);
