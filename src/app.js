@@ -49,7 +49,7 @@ app.use('/jwt', jwtRouter)
 
 // CONFIGURACION MONGO SESSIONS
 app.use(session({
-    store: MongoStore.create({
+   /*store: MongoStore.create({
         mongoUrl: uri,
         dbName,
         mongoOptions: {
@@ -57,7 +57,7 @@ app.use(session({
             useUnifiedTopology: true
         },
         ttl: 15
-    }),
+    }),*/
     secret: 'secret',
     resave: true,
     saveUninitialized: true
@@ -66,7 +66,7 @@ app.use(session({
 // Passport
 initializePassport()
 app.use(passport.initialize())
-app.use(passport.session())
+//app.use(passport.session())
 
 app.use('/api/session', sessionRouter)
 app.get('/health', (req, res) => res.send(`<h1>OK</h1>`))

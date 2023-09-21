@@ -91,9 +91,12 @@ function auth(req, res, next) {
     res.redirect('/')
 }
 
-router.get('/profile', authToken, (req, res) => {
+router.get("/profile", 
+passport.authenticate("jwt", { session: false }),
+        (req, res) => {
+
     let user = req.user
-    res.render('profile', user)
+    res.render("profile", user);
 })
 
 router.get('/login', (req, res) => {
@@ -120,8 +123,8 @@ router.post('/login', passport.authenticate('login'), async (req, res) => {
        res.cookie('coderCookie', access_token, {
             maxAge: 60*60*1000,
             httpOnly: true
-        })
-        res.render("profile", user)
+        }) .redirect("/");
+        //res.render("profile", user)
        
         }catch (e){  
             console.log(e);
