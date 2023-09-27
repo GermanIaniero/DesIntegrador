@@ -127,7 +127,7 @@ router.post('/login', passport.authenticate('login'), async (req, res) => {
         //res.render("profile", user)
        
         }catch (e){  
-            console.log(e);
+            return res.send("Usuario incorrecto")
         } 
 })
 

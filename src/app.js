@@ -20,31 +20,27 @@ import initializePassport from './config/passport.config.js'
 
 import __dirname from './utils.js'
 
-import cors from "cors"
+//import cors from "cors"
 
 //import jwtRouter from './routes/jwt.router.js'
-
+const uri = 'mongodb+srv://gerlian:1234@clusterger.mgws5uk.mongodb.net/'
+const dbName = 'eccommerce'
 const app = express()
 //mongoose.set('strictQuery', false)
-const uri = 'mongodb+srv://gerlian:1234@clusterger.mgws5uk.mongodb.net/'
+
 //const dbName = 'Login2'
 
-const dbName = 'eccommerce'
-
+// Configuracion para usar JSON en el post
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
+app.use(cookieParser())
+// static files
+app.use(express.static(__dirname + "/public"))
 
 // CONFIGURACION HANDLEBARS
 app.engine('handlebars', handlebars.engine())
 app.set('views', __dirname + '/views')
 app.set('view engine', 'handlebars')
-
-
-
-// Configuracion para usar JSON en el post
-app.use(express.json())
-app.use(cors())
-app.use(express.urlencoded({extended: true}))
-app.use(cookieParser())
-app.use('/jwt', jwtRouter)
 
 
 // CONFIGURACION MONGO SESSIONS
@@ -66,6 +62,7 @@ app.use(session({
 // Passport
 initializePassport()
 app.use(passport.initialize())
+app.use('/jwt', jwtRouter)
 //app.use(passport.session())
 
 app.use('/api/session', sessionRouter)
@@ -74,8 +71,7 @@ app.use('/', viewsRouter)
 //app.use('/', sessionRouter)
 
 
-// static files
-app.use(express.static(__dirname + "/public"))
+
 
 mongoose.connect(uri, {dbName})
     .then(() => {
